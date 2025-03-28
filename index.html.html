@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To Someone Special...</title>
+  <style>
+    body {
+      background: #f8f1e9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      font-family: 'Caveat', cursive;
+      text-align: center;
+    }
+    
+    /* Letterbox & Envelope */
+    .letterbox {
+      cursor: pointer;
+    }
+    
+    .envelope {
+      width: 300px;
+      height: 180px;
+      background: #d46a6a;
+      position: relative;
+      border-radius: 5px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    .flap {
+      width: 0;
+      height: 0;
+      border-left: 150px solid transparent;
+      border-right: 150px solid transparent;
+      border-top: 100px solid #e88a8a;
+      position: absolute;
+      top: 0;
+      transform-origin: top;
+    }
+    
+    .click-message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    
+    /* Letter */
+    .letter {
+      background: white;
+      padding: 40px;
+      max-width: 500px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      display: none;
+      transform: rotate(-1deg);
+      position: relative;
+    }
+    
+    .letter:before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('https://www.transparenttextures.com/patterns/notebook.png');
+      opacity: 0.1;
+      pointer-events: none;
+      border-radius: 10px;
+    }
+    
+    .letter h1 {
+      color: #d46a6a;
+      margin-top: 0;
+    }
+    
+    .letter p {
+      font-size: 22px;
+      line-height: 1.6;
+      text-align: left;
+      min-height: 1.6em;
+      position: relative;
+    }
+    
+    .completed-message {
+      background-color: #f0f8ff; /* Light blue highlight */
+      padding: 2px 4px;
+      border-radius: 3px;
+      transition: background-color 0.3s;
+    }
+    
+    .typing-cursor {
+      display: inline-block;
+      width: 10px;
+      height: 24px;
+      background: #d46a6a;
+      animation: blink 1s infinite;
+      vertical-align: middle;
+      margin-left: 2px;
+    }
+    
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    
+    .letter em {
+      font-style: normal;
+      background: #fff2cc;
+    }
+    
+    /* Button */
+    .btn {
+      background: #d46a6a;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      font-size: 20px;
+      border-radius: 50px;
+      cursor: pointer;
+      font-family: 'Caveat', cursive;
+      transition: all 0.3s;
+      margin-top: 20px;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeIn 0.5s forwards;
+      animation-delay: 15s;
+    }
+    
+    .btn:hover {
+      background: #b85c5c;
+      transform: scale(1.05);
+    }
+    
+    @keyframes fadeIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Instagram DM Simulation - Mobile Size */
+    .dm-screen {
+      display: none;
+      background: #fafafa;
+      width: 300px;
+      height: 500px;
+      margin: 20px auto;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1), 
+                  0 0 0 10px #111,
+                  0 0 0 12px #666,
+                  0 0 30px rgba(0,0,0,0.3);
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .dm-header {
+      background: linear-gradient(to right, #833ab4, #fd1d1d, #fcb045);
+      color: white;
+      padding: 12px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    
+    .dm-messages {
+      padding: 10px;
+      height: 400px;
+      overflow-y: auto;
+      background: url('https://i.imgur.com/zYFz7Xv.png') center/cover;
+    }
+    
+    .message-bubble {
+      margin-bottom: 10px;
+      max-width: 80%;
+      padding: 8px 12px;
+      font-size: 14px;
+      border-radius: 18px;
+      clear: both;
+      position: relative;
+    }
+    
+    .received {
+      background: #efefef;
+      float: left;
+    }
+    
+    .sent {
+      background: #3897f0;
+      color: white;
+      float: right;
+    }
+    
+    .typing-indicator {
+      background: #efefef;
+      width: 50px;
+      padding: 10px;
+      border-radius: 18px;
+      float: left;
+      display: flex;
+    }
+    
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background: #999;
+      border-radius: 50%;
+      margin: 0 2px;
+      animation: typingAnimation 1.4s infinite ease-in-out;
+    }
+    
+    .redirect-button {
+      background: linear-gradient(to right, #833ab4, #fd1d1d, #fcb045);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      font-size: 16px;
+      border-radius: 50px;
+      cursor: pointer;
+      margin-top: 20px;
+      display: block;
+      width: 200px;
+      margin: -29px auto;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    #thankYou {
+      color: #d46a6a;
+      font-size: 24px;
+      margin-top: 20px;
+    }
+    
+    /* Animations */
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    @keyframes typingAnimation {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-5px); }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Letterbox (starts closed) -->
+  <div class="letterbox" id="letterbox">
+    <div class="envelope" onclick="openLetter()">
+      <div class="flap"></div>
+      <div class="click-message">Click to Open</div>
+    </div>
+  </div>
+
+  <!-- Letter (hidden until clicked) -->
+  <div class="letter" id="letter">
+    <h1>To Someone Special,</h1>
+    <p id="paragraph1"></p>
+    <p id="paragraph2"></p>
+    <p id="paragraph3"></p>
+    <p id="paragraph4"></p>
+    <p id="paragraph5"></p>
+    
+    <!-- Working Email Form -->
+    <form id="contactForm" action="https://formsubmit.co/jwik54321@gmail.com" method="POST">
+      <input type="hidden" name="_subject" value="Someone wants to start fresh!">
+      <input type="hidden" name="_template" value="basic">
+      <input type="hidden" name="_next" value="">
+      <button type="submit" class="btn" id="startOverBtn">💙 Let's try again?</button>
+    </form>
+    <p id="thankYou" class="hidden">Thank you! I'll reach out soon 💙</p>
+  </div>
+
+  <!-- Instagram DM Simulation -->
+  <div class="dm-screen" id="dmScreen">
+    <div class="dm-header">Instagram Direct</div>
+    <div class="dm-messages" id="dmMessages"></div>
+    
+    <!-- Second Email Form for Instagram Button -->
+    <form id="instagramForm" action="https://formsubmit.co/jwik54321@gmail.com" method="POST">
+      <input type="hidden" name="_subject" value="Instagram Continue Clicked!">
+      <input type="hidden" name="_template" value="basic">
+      <input type="hidden" name="_next" value="">
+      <button type="submit" class="redirect-button" id="redirectBtn">Continue on Instagram →</button>
+    </form>
+  </div>
+
+  <script>
+    // Letter content
+    const letterContent = [
+      "I need to confess something—I messed up. Not because I didn't care, but because I cared <em>too much</em> and let my overthinking win.",
+      "Remember how we connected online? Those similarities felt like fate. When you shared your ID and said \"Text me a hi,\" I <em>wanted</em> to... but my stupid brain whispered: <em>\"She's just being polite. She didn't even liked your story—why would she care?\"</em>",
+      "The truth? I'm painfully shy. I've barely talked to girls before. I typed a message, I deleted it. Meanwhile, you were <em>waiting</em>, and I didn't realize it until today.",
+      "When you said I ghosted you, my heart dropped. Why would I <em>ghost someone I genuinely liked?</em> If I didn't care, I wouldn't be writing this. I even swore on <em>Kabaddi—the game I love</em> to prove <em>I'm not lying.</em>",
+      "This isn't an excuse. It's me owning my mistake. I'm sorry for the confusion and hurt I caused. Can we wipe the slate clean? No overthinking this time—just  giving this connection a real chance."
+    ];
+
+    // Track completed paragraphs
+    const completedParagraphs = Array(letterContent.length).fill(false);
+
+    // Open the letter when envelope is clicked
+    function openLetter() {
+      document.getElementById("letterbox").style.display = "none";
+      document.getElementById("letter").style.display = "block";
+      
+      // Start typing animation for each paragraph
+      typeLetter();
+    }
+
+    // Type out letter content character by character
+    function typeLetter() {
+      const paragraphs = [
+        document.getElementById('paragraph1'),
+        document.getElementById('paragraph2'),
+        document.getElementById('paragraph3'),
+        document.getElementById('paragraph4'),
+        document.getElementById('paragraph5')
+      ];
+      
+      let currentParagraph = 0;
+      let currentChar = 0;
+      let typingSpeed = 30; // milliseconds per character
+      let pauseBetweenParagraphs = 1000; // milliseconds
+      
+      function typeNextCharacter() {
+        if (currentParagraph >= letterContent.length) {
+          // Add cursor to the last paragraph
+          paragraphs[paragraphs.length-1].insertAdjacentHTML('beforeend', '<span class="typing-cursor"></span>');
+          setTimeout(() => {
+            document.querySelector('.typing-cursor').remove();
+          }, 500);
+          return;
+        }
+        
+        const paragraph = paragraphs[currentParagraph];
+        const text = letterContent[currentParagraph];
+        
+        if (currentChar < text.length) {
+          // Handle HTML tags differently
+          if (text[currentChar] === '<') {
+            const tagEnd = text.indexOf('>', currentChar);
+            const tag = text.substring(currentChar, tagEnd + 1);
+            paragraph.innerHTML += tag;
+            currentChar = tagEnd + 1;
+          } else {
+            paragraph.innerHTML += text[currentChar];
+            currentChar++;
+          }
+          
+          // Add blinking cursor
+          paragraph.querySelector('.typing-cursor')?.remove();
+          paragraph.insertAdjacentHTML('beforeend', '<span class="typing-cursor"></span>');
+          
+          setTimeout(typeNextCharacter, typingSpeed);
+        } else {
+          // Mark paragraph as completed and highlight it
+          completedParagraphs[currentParagraph] = true;
+          paragraph.innerHTML = `<span class="completed-message">${paragraph.innerHTML}</span>`;
+          paragraph.querySelector('.typing-cursor')?.remove();
+          
+          currentParagraph++;
+          currentChar = 0;
+          
+          if (currentParagraph < letterContent.length) {
+            setTimeout(typeNextCharacter, pauseBetweenParagraphs);
+          } else {
+            // All paragraphs typed
+            setTimeout(() => {
+              paragraphs[paragraphs.length-1].querySelector('.typing-cursor')?.remove();
+            }, 500);
+          }
+        }
+      }
+      
+      // Start typing
+      typeNextCharacter();
+    }
+
+    // Handle form submission for "Let's try again" button
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const thankYou = document.getElementById('thankYou');
+      
+      fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form)
+      })
+      .then(() => {
+        form.classList.add('hidden');
+        thankYou.classList.remove('hidden');
+        setTimeout(() => {
+          document.getElementById('letter').style.display = 'none';
+          document.getElementById('dmScreen').style.display = 'block';
+          
+          // Simulate Instagram conversation
+          const dmMessages = document.getElementById('dmMessages');
+          
+          // Your first message
+          setTimeout(() => {
+            addMessage("Hi... take this as my fresh start with you 💙", "received");
+            
+            // Typing indicator
+            setTimeout(() => {
+              const typing = document.createElement('div');
+              typing.className = 'typing-indicator';
+              typing.innerHTML = `
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+              `;
+              dmMessages.appendChild(typing);
+              
+              // Her reply
+              setTimeout(() => {
+                dmMessages.removeChild(typing);
+                addMessage("hi", "sent");
+              }, 2000);
+            }, 1500);
+          }, 500);
+          
+          function addMessage(text, type) {
+            const msg = document.createElement('div');
+            msg.className = `message-bubble ${type}`;
+            msg.textContent = text;
+            dmMessages.appendChild(msg);
+            dmMessages.scrollTop = dmMessages.scrollHeight;
+          }
+        }, 1000);
+      })
+      .catch(error => alert('Error: ' + error));
+    });
+
+    // Handle Instagram redirect button
+    document.getElementById('instagramForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const form = e.target;
+      
+      fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form)
+      })
+      .then(() => {
+        alert("I'll reach out to you soon Alisha 💙");
+        window.location.href = 'https://';
+      })
+      .catch(error => alert('Error: ' + error));
+    });
+  </script>
+</body>
+</html>
